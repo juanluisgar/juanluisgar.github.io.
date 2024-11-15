@@ -3,23 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dibujo de un Elefante</title>
-    <style>
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f0f0f0;
-        }
-        img {
-            max-width: 100%;
-            height: auto;
-        }
-    </style>
+    <title>Datos del Sensor MQ-2</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <img src="https://upload.wikimedia.org/wikipedia/commons/3/37/African_Bush_Elephant.jpg" alt="Dibujo de un elefante">
+    <h1>Datos del Sensor MQ-2</h1>
+    <p>Último valor: <span id="lastValue"></span></p>
+    <canvas id="chart"></canvas>
+
+    <script>
+        const dataUrl = 'https://api.github.com/repos/TU_USUARIO/TU_REPOSITORIO/contents/data.json';
+        const ctx = document.getElementById('chart').getContext('2d');
+        let chart;
+
+        function updateData() {
+            fetch(dataUrl)
+                .then(response => response.json())
+                .then(data => {
+                    const content = JSON.parse(atob(data.content));
+                    document.getElementById('lastValue').textContent = content.value;
+                    
+                    if (!chart) {
+                        chart = new Chart(ctx, {
+                            type: 'line',
+                            data: {
+                                labels: [],
+                                datasets: [{
+                                    label: 'Valor del Sensor',
+                                    data: [],
+                                    borderColor: 'rgb(75, 192, 192)',
+                                    tension: 0.1
+                                }]
+                            }
+                        });
+                    }
+                    
+                    chart.data.labels.push(new Date().toLocaleTimeString());
+                    chart.data.datasets[0].data.push(content.value);
+                    
+                    if (chart.data.labels.length > 10) {
+                        chart.data.labels.shift();
+                        chart.data.datasets[0].data.shift();
+                    }
+                    
+                    chart.update();
+                });
+        }
+
+        setInterval(updateData, 60000); // Actualiza cada minuto
+        updateData(); // Actualiza inmediatamente al cargar la página
+    </script>
 </body>
 </html>
