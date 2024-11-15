@@ -3,43 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gráfico de Barras en Tiempo Real</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>Dibujo de un Elefante</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
 </head>
 <body>
-    <canvas id="myChart" width="400" height="200"></canvas>
-    <script>
-        const ctx = document.getElementById('myChart').getContext('2d');
-        const myChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: [],
-                datasets: [{
-                    label: 'Valor del Sensor MQ2',
-                    data: [],
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
-
-        async function fetchData() {
-            const response = await fetch('data.json');
-            const data = await response.json();
-            myChart.data.labels.push(new Date().toLocaleTimeString());
-            myChart.data.datasets[0].data.push(data.value);
-            myChart.update();
-        }
-
-        setInterval(fetchData, 10000); // Actualizar cada 10 segundos
-    </script>
+    <img src="https://upload.wikimedia.org/wikipedia/commons/3/37/African_Bush_Elephant.jpg" alt="Dibujo de un elefante">
 </body>
 </html>
