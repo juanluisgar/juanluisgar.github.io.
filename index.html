@@ -3,55 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Datos del Sensor MQ-2</title>
+    <title>Datos del Sensor MQ136</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <h1>Datos del Sensor MQ-2</h1>
-    <p>Último valor: <span id="lastValue"></span></p>
-    <canvas id="chart"></canvas>
-
+    <h1>Datos del Sensor MQ136</h1>
+    <canvas id="sensorChart" width="400" height="200"></canvas>
+    
     <script>
-        const dataUrl = 'https://juanluisgar.github.io/juanluisgar.github.io./';
-        const ctx = document.getElementById('chart').getContext('2d');
-        let chart;
+    const ctx = document.getElementById('sensorChart').getContext('2d');
+    let chart;
 
-        function updateData() {
-            fetch(dataUrl)
-                .then(response => response.json())
-                .then(data => {
-                    const content = JSON.parse(atob(data.content));
-                    document.getElementById('lastValue').textContent = content.value;
-                    
-                    if (!chart) {
-                        chart = new Chart(ctx, {
-                            type: 'line',
-                            data: {
-                                labels: [],
-                                datasets: [{
-                                    label: 'Valor del Sensor',
-                                    data: [],
-                                    borderColor: 'rgb(75, 192, 192)',
-                                    tension: 0.1
-                                }]
-                            }
-                        });
-                    }
-                    
-                    chart.data.labels.push(new Date().toLocaleTimeString());
-                    chart.data.datasets[0].data.push(content.value);
-                    
-                    if (chart.data.labels.length > 10) {
-                        chart.data.labels.shift();
-                        chart.data.datasets[0].data.shift();
-                    }
-                    
+    function actualizarGrafico() {
+        fetch('datos.json')
+            .then(response => response.json())
+            .then(data => {
+                const labels = data.map(item => item.timestamp);
+                const valores = data.map(item => item.valor);
+
+                if (chart) {
+                    chart.data.labels = labels;
+                    chart.data.datasets[0].data = valores;
                     chart.update();
-                });
-        }
+                } else {
+                    chart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: 'Valor del Sensor MQ136',
+                                data: valores,
+                                borderColor: 'rgb(75, 192, 192)',
+                                tension: 0.1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+                }
+            });
+    }
 
-        setInterval(updateData, 60000); // Actualiza cada minuto
-        updateData(); // Actualiza inmediatamente al cargar la página
+    setInterval(actualizarGrafico, 30000); // Actualiza cada 30 segundos
+    actualizarGrafico(); // Actualiza inmediatamente al cargar la página
     </script>
 </body>
 </html>
